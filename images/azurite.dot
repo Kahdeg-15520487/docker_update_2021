@@ -1,0 +1,8 @@
+digraph G {
+  graph [bgcolor="#ffffff" pad=0.5 ratio="fill"]
+  "azurite" [shape="component"]
+  "named: ${USERPROFILE}\\azurite" [shape="folder"]
+  10000 [shape="circle"]
+  "named: ${USERPROFILE}\\azurite" -> "azurite" [style="dashed" label="data" dir="both"]
+  10000 -> "azurite" [style="solid"]
+}

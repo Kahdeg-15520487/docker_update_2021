@@ -1,0 +1,10 @@
+digraph G {
+  graph [bgcolor="#ffffff" pad=0.5 ratio="fill"]
+  "mssql" [shape="component"]
+  ".\\services\\sqlserver" [shape="folder"]
+  ".\\src\\Rosen.EMP.Api\\SqlScripts\\SqlServer" [shape="folder"]
+  1433 [shape="circle"]
+  ".\\services\\sqlserver" -> "mssql" [style="dashed" label="opt" dir="both"]
+  ".\\src\\Rosen.EMP.Api\\SqlScripts\\SqlServer" -> "mssql" [style="dashed" label="/opt/script/sql" dir="both"]
+  1433 -> "mssql" [style="solid"]
+}

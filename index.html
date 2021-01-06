@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Title</title>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="highlight/styles/dracula.css">
+  <link rel="stylesheet" type="text/css" href="asciinema-player.css" />
+  <script src="highlight/highlight.pack.js"></script>
+  <script type="text/javascript" src="renderjson.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad();
+  </script>
+  <style>
+    @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+    @import url(https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+    @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+    body {
+      font-family: 'Droid Serif';
+    }
+
+    h1,
+    h2,
+    h3 {
+      font-family: 'Yanone Kaffeesatz';
+      font-weight: normal;
+    }
+
+    table,
+    th,
+    td {
+      border: 1px solid black;
+    }
+
+    .class {
+      color: #4EC9A1
+    }
+
+    .interface {
+      color: #B8D7A3
+    }
+
+    .empha {
+      color: red
+    }
+
+    .small-text {
+      font-size: 16px
+    }
+
+    .small-image img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .bigimage {
+      width: 100%;
+      max-height: unset;
+      max-width: unset;
+    }
+
+    .hide {
+      display: none;
+    }
+
+    .remark-code,
+    .remark-inline-code {
+      color: white;
+      font-family: 'Ubuntu Mono';
+    }
+
+    .hljs-default .hljs-string {
+      color: #D0967E;
+    }
+
+    .navback {
+      float: right;
+    }
+  </style>
+  <script>
+    // setup 
+    // document.addEventListener("DOMContentLoaded", function (event) {
+    //   let linq_collab = document.getElementById("linq-collabsible");
+    //   renderjson.set_show_to_level(3);
+    //   linq_collab.appendChild(
+    //     renderjson([{
+    //         'id': 0,
+    //         'name': 'Molly',
+    //         'address': 'W Smithfield, London EC1A 7BE',
+    //         'city': 'London'
+    //       },
+    //       {
+    //         'id': 1,
+    //         'name': 'Sherlock',
+    //         'address': '221b Baker St',
+    //         'city': 'London'
+    //       },
+    //       {
+    //         'id': 2,
+    //         'name': 'Mycroft',
+    //         'address': '10 Downing St',
+    //         'city': 'London'
+    //       },
+    //     ])
+    //   );
+    //   renderjson.set_show_to_level(1);
+    //   console.log(linq_collab);
+    // });
+    const protocol = {
+      'http:': 'http://localhost:5000',
+      'https:': 'https://localhost:5001',
+    }
+
+    const slideUrl = {
+      '1': protocol[location.protocol] + '/api/value'
+    };
+
+    function request(slide) {
+      console.log(slide);
+      let t0 = performance.now();
+      fetch(slideUrl[slide])
+        .then(function (response) {
+          return response.json();
+        })
+        .then(function (myJson) {
+          console.log(0);
+          let result = JSON.stringify(myJson);
+          console.log(result);
+          let t1 = performance.now();
+          let resultDisplay = document.getElementById("result" + slide);
+          while (resultDisplay.firstChild) {
+            resultDisplay.removeChild(resultDisplay.firstChild);
+          }
+          resultDisplay.appendChild(renderjson(myJson));
+          document.getElementById("time" + slide).textContent = "time taken: " + (t1 - t0) + " milliseconds.";
+        });
+    }
+  </script>
+</head>
+
+<body>
+  <textarea id="source">
+
+name: start
+class: center
+.navback[.bottomlink[[pdf](pr.pdf)]]
+# Demo dockerized development environment
+<asciinema-player src="2021_01_05_02_06_pm" cols="120" rows="28" start-at="3" preload="true" speed="1.5"></asciinema-player>
+---
+name: contents
+class: left
+
+# Table of Contents
+
+• [Quickstart](#Quickstart)
+
+• [Services's architecture](#structure)
+
+• [Guideline](#guideline)
+
+---
+name: Quickstart
+class: left
+.navback[[back](#contents)]
+# Quickstart
+1. clone OR-API-mock repo
+2. run build.bat script in cloned OR-API-mock folder
+3. clone PCS-API repo
+4. run script/clean.bat to remove and clean old containers
+5. run script/run.bat to build and rundified to run
+on simple cli tool without visual studio
+
+---
+name: structure
+class: left
+.navback[[back](#contents)]
+# Overall architecture of the services
+.small-image[![lala](images/docker-compose.png)]
+
+???
+appsetting override localdev
+
+
+
+generate dev https certificate using dotnet dev-cert tool
+
+the basic dockerfile and docker-compose-yml is generated
+with visual studio container tool and then mo
+
+---
+name: structure.mssql
+.navback[[back](#structure)]
+# MSSQL - SQL database
+
+Mounting volume
+- .\services\sqlserver -> /opt/script/init_mssql
+- .\src\Rosen.Data\Resource\SqlScripts -> /opt/script/sql
+
+Port mapping
+- 1433 (internal) -> 4433 (external)
+???
+mount initial seeding script using volume
+
+port configuration
+
+---
+name: structure.depend
+.navback[[back](#structure)]
+# Expressing connection between services
+
+By default Compose sets up a single network for your app.
+
+Each container for a service joins the default network and is both .empha[reachable] by other containers on that network, and discoverable by them at a hostname identical to the container name.
+
+Example appsettings: 
+<pre><code class="json" style="background-color:darkslategray;color:white" >
+"ConnectionStrings": {
+  "Portal": "Server=mssql,1433\\Catalog=ROSEN_PCS;Database=ROSEN_PCS;User Id=SA;Password=Your_password123",
+  "AMS": "Server=mssql,1433\\Catalog=ROSEN_AMS;Database=ROSEN_AMS;User Id=SA;Password=Your_password123"
+},
+"ApiUri": {
+  "Portal": "",
+  "ReportingAgent": "http://or_api_mock:5200/"
+},
+"ReportingAgent": {
+  "tokenEndpoint": "http://or_api_mock:5200/assets/token"
+}
+</code></pre>
+
+---
+name: guideline
+class: left
+.right[[back](#contents)]
+# Other tidbit
+
+• [SQL connection string](#guideline.pcsapi.sql)
+
+• [Create a https dev-cert](#guideline.pcsapi.https.gen)
+
+---
+name: guideline.pcsapi.sql
+class: left
+
+.right[[back](#guideline)]
+
+# SQL connection string:
+
+mssql is the name of the MSSQL service's name defined in the docker-compose.yml
+
+1433 is the port configured for the MSSQL service in the docker-compose.override.yml
+
+<pre><code class="json" style="background-color:darkslategray;color:white" >
+  "ConnectionStrings": {
+    "Portal": "Server=mssql,1433\\Catalog=ROSEN_PCS;Database=ROSEN_PCS;User Id=SA;Password=Your_password123",
+    "AMS": "Server=mssql,1433\\Catalog=ROSEN_AMS;Database=ROSEN_AMS;User Id=SA;Password=Your_password123"
+  }
+</code></pre>
+
+---
+name: guideline.pcsapi.https.gen
+class: left
+
+.right[[back](#guideline)]
+
+# Create a dev-certs using dev-certs tool and use it for the API service's https
+
+generate a dev-cert
+<pre><code class="json" style="background-color:darkslategray;color:white" >  dotnet dev-certs https --clean
+  dotnet dev-certs https -ep %APPDATA%\ASP.NET\Https\aspnetapp.pfx -p "password"
+  dotnet dev-certs https --trust
+</code></pre>
+
+---
+class: center, middle
+
+# DEMO Time!
+
+---
+class: center, middle
+
+# QA Time!
+
+---
+
+class: center, middle
+
+# The End
+
+    </textarea>
+  <script src="remark.js">
+  </script>
+  <script>
+    var slideshow = remark.create();
+  </script>
+  <script src="asciinema-player.js"></script>
+</body>
+
+</html>
